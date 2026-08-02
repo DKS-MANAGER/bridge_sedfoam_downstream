@@ -113,22 +113,15 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors    4;       // 4 outer PIMPLE iterations for stability
-    nNonOrthogonalCorrectors 1; // mesh is orthogonal but 1 adds robustness
-    nCorrectors         2;
+    nOuterCorrectors    2;       // 2 outer PIMPLE iterations (standard for sedFoam at Co<=0.3)
+    nNonOrthogonalCorrectors 0; // mesh is orthogonal, no non-ortho correction needed
+    nCorrectors         1;       // 1 inner pressure corrector per outer loop
     nAlphaCorr      1;
-    correctAlpha    yes;         // enabled to stabilize concentration coupling at higher timesteps
+    correctAlpha    yes;
 }
 
-relaxationFactors
-{
-    equations
-    {
-        "U.a"               0.5;
-        "U.b"               0.5;
-        "pa"                0.2;
-    }
-}
+// No under-relaxation needed at Co <= 0.3 with 2 outer correctors
+// Removing relaxation eliminates artificial damping that slows convergence
 
 
 // ************************************************************************* //

@@ -47,10 +47,10 @@ runTimeModifiable on;
 
 adjustTimeStep  true;
 
-maxCo           0.5;    // Optimal fluid Courant limit for PIMPLE (up to 4 outer correctors)
+maxCo           0.3;    // Ultra-stable fluid Courant limit for multiphase PIMPLE coupling
 
-maxAlphaCo      0.5;    // Optimal phase Courant limit
+maxAlphaCo      0.3;    // Ultra-stable phase Courant limit to prevent interface volume fraction overshoot
 
-maxDeltaT       1e-2;   // 10.0 ms timestep ceiling for high-speed execution under stable conditions
+maxDeltaT       1e-3;   // Conservative 1.0 ms timestep ceiling for rock-solid stability
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
