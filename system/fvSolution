@@ -19,31 +19,31 @@ solvers
     p_rbgh
     {
         solver          GAMG;
-        tolerance       1e-05;  // optimized for speed
-        relTol          0.05;
-        smoother        GaussSeidel; // faster convergence
-        nPreSweeps      1;
-        nPostSweeps     1;
+        tolerance       1e-05;
+        relTol          0.01;
+        smoother        DIC;
+        nPreSweeps      0;
+        nPostSweeps     2;
         nFinestSweeps   2;
         cacheAgglomeration true;
-        nCellsInCoarsestLevel 200;
+        nCellsInCoarsestLevel 10;
         agglomerator    faceAreaPair;
-        mergeLevels     2;      // faster coarsening stage
+        mergeLevels     1;
     }
 
     p_rbghFinal
     {
         solver          GAMG;
-        tolerance       5e-06;  // optimized for speed
-        relTol          0.01;   // prevents solver from taking 200+ iterations at final step
-        smoother        GaussSeidel;
-        nPreSweeps      1;
-        nPostSweeps     1;
+        tolerance       1e-06;
+        relTol          0;
+        smoother        DIC;
+        nPreSweeps      0;
+        nPostSweeps     2;
         nFinestSweeps   2;
         cacheAgglomeration true;
-        nCellsInCoarsestLevel 200;
+        nCellsInCoarsestLevel 10;
         agglomerator    faceAreaPair;
-        mergeLevels     2;
+        mergeLevels     1;
     }
 
     "(k.b|epsilon.b|omega.b)"
@@ -113,15 +113,22 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors    2;       // 2 outer PIMPLE iterations (standard for sedFoam at Co<=0.3)
-    nNonOrthogonalCorrectors 0; // mesh is orthogonal, no non-ortho correction needed
-    nCorrectors         1;       // 1 inner pressure corrector per outer loop
+    nCorrectors         2;
+    nNonOrthogonalCorrectors 1;
     nAlphaCorr      1;
     correctAlpha    yes;
+    pRefPoint       (3.49 0.099 0.0);
+    pRefValue       0;
 }
 
-// No under-relaxation needed at Co <= 0.3 with 2 outer correctors
-// Removing relaxation eliminates artificial damping that slows convergence
+relaxationFactors
+{
+    fields
+    {
+        pa              1.;
+    }
+}
 
 
 // ************************************************************************* //
+

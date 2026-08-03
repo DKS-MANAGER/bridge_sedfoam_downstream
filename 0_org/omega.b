@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 0 -1 0 0 0 0];
 
-internalField   uniform 5.590;
+internalField   uniform 3.66;
 
 boundaryField
 {
@@ -36,7 +36,7 @@ boundaryField
                 scalar y = Cf[faceI].y();
                 if (y > 0.0)
                 {
-                    field[faceI] = 5.590;
+                    field[faceI] = 3.66;
                 }
                 else
                 {
@@ -61,7 +61,7 @@ boundaryField
     bridge
     {
         type            omegaWallFunction;
-        value           uniform 5.590;
+        value           uniform 3.66;
     }
     frontAndBack
     {

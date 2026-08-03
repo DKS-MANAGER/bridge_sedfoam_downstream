@@ -1,12 +1,12 @@
-# OpenFOAM gitignore
-[0-9]*/
+# OpenFOAM runtime directories
+[0-9]*
 !0_org/
-postProcessing/
-processor*/
-dynamicCode/
+processor*
 log.*
 *.foam
-*.xy
-log.test
-gradPOSC.txt
-
+*.so
+dynamicCode/
+.DS_Store
+Thumbs.db
+*.bak
+*~

@@ -22,10 +22,35 @@ boundaryField
 {
     inlet
     {
-        // zeroGradient: alpha.b=0.40 in bed set by setFields at t=0.
-        // codedFixedValue was continuously re-injecting alpha.b=0.40
-        // at inlet, fighting the solver and causing alpha.a+alpha.b != 1.
-        type            zeroGradient;
+        type            codedFixedValue;
+        value           uniform 1;
+        name            inletProfileAlphaB;
+        codeInclude
+        #{
+            #include "fvCFD.H"
+        #};
+        codeOptions
+        #{
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+        codeLibs
+        #{
+            -lfiniteVolume \
+            -lmeshTools
+        #};
+        code
+        #{
+            const fvPatch& boundaryPatch = patch();
+            const vectorField& Cf = boundaryPatch.Cf();
+            scalarField& field = *this; 
+            forAll(Cf, faceI)
+            {
+                 field[faceI] = 1.0 - (0.60 * 0.5
+                               *(1.0 + Foam::tanh((0.0 - Cf[faceI].y()) * 5000))
+                               + 1e-100);
+            }
+        #};
     }
     outlet
     {

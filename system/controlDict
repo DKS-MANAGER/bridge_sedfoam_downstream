@@ -29,7 +29,7 @@ deltaT          1e-5;   // very conservative startup - allows bed to settle befo
 
 writeControl    adjustableRunTime;
 
-writeInterval   5;      // Save every 5s instead of 1s to reduce disk space for 400s run
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -47,10 +47,10 @@ runTimeModifiable on;
 
 adjustTimeStep  true;
 
-maxCo           0.3;    // Ultra-stable fluid Courant limit for multiphase PIMPLE coupling
+maxCo           0.5;    // Standard stable PIMPLE Courant limit
 
-maxAlphaCo      0.3;    // Ultra-stable phase Courant limit to prevent interface volume fraction overshoot
+maxAlphaCo      0.7;    // Allows larger timesteps for speed
 
-maxDeltaT       1e-3;   // Conservative 1.0 ms timestep ceiling for rock-solid stability
+maxDeltaT       0.01;   // 10.0 ms timestep ceiling (10x faster execution speed)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

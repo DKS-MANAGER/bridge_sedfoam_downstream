@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0.35 0 0);
+internalField   uniform (0.23 0 0);
 
 boundaryField
 {
@@ -31,7 +31,7 @@ boundaryField
             const vectorField& Cf = boundaryPatch.Cf();
             vectorField& field = *this;
             scalar t = this->db().time().value();
-            scalar ramp = t <= 2.0 ? (0.1 + 0.9 * (t / 2.0)) : 1.0;
+            scalar ramp = t <= 5.0 ? (0.1 + 0.9 * (t / 5.0)) : 1.0;
 
             forAll(Cf, faceI)
             {
@@ -39,7 +39,7 @@ boundaryField
                 if (y > 0.0)
                 {
                     scalar ratio = Foam::max(0.0, y) / 0.10;
-                    scalar u_x = ramp * 0.40 * Foam::pow(ratio, 1.0/7.0);
+                    scalar u_x = ramp * 0.263 * Foam::pow(ratio, 1.0/7.0);
                     field[faceI] = vector(u_x, 0, 0);
                 }
                 else
@@ -53,7 +53,7 @@ boundaryField
     {
         type            inletOutlet;
         inletValue      uniform (0 0 0);
-        value           uniform (0.35 0 0);
+        value           uniform (0.23 0 0);
     }
     bottom
     {

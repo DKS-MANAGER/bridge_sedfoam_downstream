@@ -7,6 +7,9 @@ cd "${0%/*}" || exit                                # Run from this directory
 # Clean case
 ./Allclean
 
+echo "Setting initial writeInterval to 1s in controlDict..."
+sed -i 's/^writeInterval.*/writeInterval   1;/g' system/controlDict
+
 echo "Generating mesh using blockMesh..."
 blockMesh > log.blockMesh 2>&1
 
@@ -25,7 +28,38 @@ ln -s Cz 0/ccz 2>/dev/null || true
 echo "Decomposing case..."
 decomposePar > log.decomposePar 2>&1
 
+echo "Starting automated writeInterval monitor..."
+python3 -c "
+import time, os, re
+while True:
+    time.sleep(5)
+    if os.path.exists('log.sedFoam_rbgh'):
+        try:
+            with open('log.sedFoam_rbgh', 'r', errors='ignore') as f:
+                lines = f.readlines()[-200:]
+            t_val = 0.0
+            for l in reversed(lines):
+                if l.startswith('Time = '):
+                    t_val = float(l.split()[2])
+                    break
+            target = 1
+            if t_val >= 50.0:
+                target = 10
+            elif t_val >= 10.0:
+                target = 5
+            
+            with open('system/controlDict', 'r') as f:
+                c = f.read()
+            new_c = re.sub(r'writeInterval\s+\d+;', f'writeInterval   {target};', c)
+            if new_c != c:
+                with open('system/controlDict', 'w') as f:
+                    f.write(new_c)
+        except Exception:
+            pass
+" &
+
 echo "Running sedFoam_rbgh on 8 processors..."
 mpirun --oversubscribe -np 8 sedFoam_rbgh -parallel > log.sedFoam_rbgh 2>&1 &
 
-echo "Simulation launched in background."
+echo "Simulation launched in background with automatic output saving schedule."
+

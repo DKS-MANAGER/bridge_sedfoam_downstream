@@ -1,240 +1,175 @@
-# Computational Fluid Dynamics (CFD) Validation Case: Erodible-Bed Contraction Scour using SedFoam
+# Eulerian-Eulerian Two-Phase Downstream Clear-Water Scour Simulation
 
-This repository contains the OpenFOAM (v2412) implementation, grid setup, and parallel run configurations designed to model vertical bridge contraction scour over an erodible sediment bed. By utilizing the high-fidelity two-phase solver **`sedFoam_rbgh`**, this model transitions the rigid-bed vertical contraction setup from the ASCE study (Majid et al., 2026) into a fully resolved mobile-bed sediment transport, erodible bed deformation, and morphological scour evolution case.
-
----
-
-## 1. Project Overview & Context
-
-This numerical model adapts the experimental hydraulic flume configurations described in the ASCE Journal of Hydraulic Engineering study:
-> **Effect of Bed Roughness on Pressure Flow due to Vertical Contraction**  
-> *Sofi Aamir Majid, S.M.ASCE; Shivam Tripathi; and Debopam Das*  
-> *ASCE Journal of Hydraulic Engineering (Volume 152, Issue 3, January 2026)*  
-> DOI: [10.1061/JHEND8.HYENG-14490](https://doi.org/10.1061/JHEND8.HYENG-14490)
-
-The original experimental work analyzed pressure-flow hydrodynamics under a vertical bridge contraction using a rigid bed with three roughness grades ($K_s = 0.33\text{ mm}$, $0.68\text{ mm}$, and $1.90\text{ mm}$). In this mobile sediment bed implementation, the bed material has been updated to **Grade-III Ahmedabad sand ($d_{50} = 0.294\text{ mm}$)**.
-
-In this repository, the setup is converted into a **mobile sediment bed** to simulate morphological scour. We employ the Eulerian-Eulerian two-phase flow solver `sedFoam_rbgh` coupled with the Boyer et al. $\mu(I)$ granular rheology model to resolve granular shear deformation, dilatancy, and erosion under the bridge contraction ceiling.
-
-### 1.1 2D Contraction Scour Domain Schematic
-Below is the technical schematic of the simulation domain, axis alignment, and flow parameters:
-
-![2D Flume Simulation Schematic](bridge_scour_geometry.png)
+This repository contains the complete case setup for a high-resolution, parallelized 2D CFD simulation of **pressure-flow downstream scour** under a bridge deck. The simulation is conducted using the two-fluid Eulerian-Eulerian solver **`sedFoam_rbgh`** in OpenFOAM.
 
 ---
 
-## 2. Hydraulic & Physical Parameters
+## 📌 Project Overview
+The objective of this simulation is to resolve the detailed fluid-sediment mechanics, sediment suspension, contraction scour, and bed morphology under pressure-flow conditions. When high river discharge causes the water level to exceed the lower chord (soffit) of a bridge deck, it creates a vertical flow contraction. The resulting localized velocity acceleration and turbulence generation drive massive scour.
 
-The baseline flow, fluid, and sediment properties configured in the workspace are summarized below:
-
-### 2.1 Flow & Channel Geometry
-| Parameter | Symbol | Value | Context / Reference |
-| :--- | :---: | :--- | :--- |
-| Approach Flow Depth | $H_a$ | $0.10\text{ m}$ | Clear-water depth above the sediment bed |
-| Channel Bed Slope | $S_0$ | $0.018\%$ | Integrated as gravity component $g_x = 0.0017658\text{ m/s}^2$ |
-| Channel Width | $Z_w$ | $0.30\text{ m}$ | Modeled as $0.01\text{ m}$ 2D slice (empty boundaries) |
-| Bridge Constriction Length | $L$ | $0.15\text{ m}$ | Located streamwise from $x = 1.0\text{ m}$ to $x = 1.15\text{ m}$ |
-| Contraction Ceiling Height | $H_b$ | $0.075\text{ m}$ | Clear throat height under the bridge soffit |
-| Constriction Ratio | $H_b/H_a$ | $0.75$ | $25\%$ vertical area constriction |
-
-### 2.2 Phase Properties & Physics
-| Parameter | Symbol | Value | Case File Reference |
-| :--- | :---: | :--- | :--- |
-| Fluid Phase Density (Water) | $\rho_f$ | $1000\text{ kg/m}^3$ | [transportProperties](file:///e:/DKS/bridge_sedfoam/constant/transportProperties#L28) |
-| Fluid Kinematic Viscosity | $\nu_f$ | $1.0 \times 10^{-6}\text{ m}^2/\text{s}$ | [transportProperties](file:///e:/DKS/bridge_sedfoam/constant/transportProperties#L29) |
-| Sediment Phase Density | $\rho_s$ | $2650\text{ kg/m}^3$ | [transportProperties](file:///e:/DKS/bridge_sedfoam/constant/transportProperties#L19) |
-| Median Grain Diameter | $d_{50}$ | $0.294\text{ mm}$ (Ahmedabad Sand) | [transportProperties](file:///e:/DKS/bridge_sedfoam/constant/transportProperties#L21) |
-| Frictional Friction Angle | $\phi$ | $22.02^\circ$ (mus = 0.4) | [granularRheologyProperties](file:///e:/DKS/bridge_sedfoam/constant/granularRheologyProperties#L26) |
-| Maximum Packing Limit | $\alpha_{s,\text{max}}$ | $0.635$ | [granularRheologyProperties](file:///e:/DKS/bridge_sedfoam/constant/granularRheologyProperties#L24) |
-| Frictional Pressure Exponent | $\eta_1$ | $5$ | [ppProperties](file:///e:/DKS/bridge_sedfoam/constant/ppProperties#L29) |
-| Inter-phase Drag Model | — | Gidaspow-Schiller-Naumann | [interfacialProperties](file:///e:/DKS/bridge_sedfoam/constant/interfacialProperties#L18) |
-| Turbulence Formulation | — | twophasekOmega (fluid phase) | [turbulenceProperties.b](file:///e:/DKS/bridge_sedfoam/constant/turbulenceProperties.b#L22) |
+This case models **Experiment-03(c)** from the reference paper, characterized by a clear-water scour regime ($V_a / V_c = 0.84 < 1.0$, where approach flow velocity is less than the critical sediment entrainment velocity). Scouring is localized under the bridge and shifts downstream of the deck due to decelerating flow expansion.
 
 ---
 
-## 3. Repository & Directory Map
+## ⚙️ Dependencies
+*   **OpenFOAM**: Version `2412` (OpenCFD / www.openfoam.com).
+*   **Solver**: `sedFoam_rbgh` (two-fluid Eulerian solver for sediment-water mixtures).
+*   **Utilities**:
+    *   `ParaView` (v5.12+ recommended) for 3D/2D visualization.
+    *   `Python 3` (with `numpy` and `struct`) for post-processing binary data.
 
-The directory structure is organized as follows:
+---
 
-```directory
-bridge_sedfoam/
-├── 0_org/                      # Original boundary & initial condition fields
-│   ├── alpha.a                 # Sediment phase fraction (0.60 inside bed, 0.0 above)
-│   ├── alpha.b                 # Fluid phase fraction (0.40 inside bed, 1.0 above)
-│   ├── U.a                     # Sediment velocity (no-slip walls, uniform zero inlet)
-│   ├── U.b                     # Fluid velocity (1/7th power law inlet profile)
-│   ├── p_rbgh                  # Shared dynamic pressure (zero at outlet)
-│   ├── k.b                     # Fluid phase Turbulent Kinetic Energy (TKE)
-│   ├── omega.b                 # Fluid phase Specific Dissipation Rate
-│   ├── nut.b                   # Fluid turbulent kinematic viscosity (wall functions)
-│   ├── Theta                   # Granular temperature BC
-│   ├── pa                      # Shear-induced granular pressure field
-│   └── alphaPlastic / delta    # Plasticity & dilatancy parameters
-├── constant/                   # Physical models and fluid/solid properties
-│   ├── g                       # Gravity vector with bed slope incline
-│   ├── transportProperties     # Phase densities, settling parameters, viscosity limits
-│   ├── granularRheologyProperties # Boyer et al. mu(I) friction & viscosity settings
-│   ├── ppProperties            # Johnson-Jackson contact pressure model settings
-│   ├── interfacialProperties    # Inter-phase drag model definitions
-│   ├── forceProperties          # Mean pressure gradient and lift/virtual mass coefficients
-│   ├── turbulenceProperties.a  # Laminar settings for solid phase
-│   ├── turbulenceProperties.b  # k-omega turbulence parameters for fluid phase
-│   └── twophaseRASProperties   # Two-phase RAS parameters and limiters
-├── system/                     # Discretization, solvers, and parallel settings
-│   ├── blockMeshDict           # Structured hex-mesh block and grading definitions
-│   ├── setFieldsDict           # Sediment bed (y < 0) volume fraction initialization
-│   ├── fvSchemes               # Discretization schemes (implicit time, bounded upwind)
-│   ├── fvSolution              # Linear solvers, tolerances, and PIMPLE correctors
-│   ├── controlDict             # Sim execution limits, write time step, adjustTimeStep
-│   └── decomposeParDict        # Domain decomposition parameters (scotch, 8 processors)
-├── Allclean                    # Bash utility to reset and clean case directories
-├── Allrun                      # Bash utility to mesh, initialize, and launch the run
-├── bridge_scour_geometry.png   # Side-view schematic of contraction domain
-└── fo.foam                     # ParaView metadata load link
+## 📐 Geometry & Mesh
+*   **Domain Dimensions**: Length $x \in [0, 3.5]\text{ m}$, Height $y \in [-0.10, 0.10]\text{ m}$.
+*   **Erodible Bed Depth**: $10.0\text{ cm}$ (initialized from $y = -0.10\text{ m}$ to $y = 0.0\text{ m}$).
+*   **Bridge Deck Location**: Blocked out from $x \in [1.0, 1.15]\text{ m}$, $y \in [0.070, 0.10]\text{ m}$.
+*   **Bridge Opening chord ($H_b$)**: $7.0\text{ cm}$ (giving an opening ratio $H_b/Y = 0.70$).
+
+### Schematic Diagram of Domain Layout
+```
+                                 x = 1.0 m       x = 1.15 m
+       +----------------------------+               +----------------------------+ y = 0.10 m
+       |                            |  Bridge Deck  |                            |
+       |       Water column         |  [BLOCKED]    |                            |
+       |       (Phase B)            +---------------+                            | y = 0.070 m (Soffit)
+       |                                                                         |
+       |                                                                         |
+=======+=========================================================================+ y = 0.0 m (Bed Interface)
+       :                                                                         :
+       :                       Erodible Sand Bed (Phase A)                       :
+       +-------------------------------------------------------------------------+ y = -0.10 m (Flume Floor)
+      x = 0.0 m                                                                 x = 3.5 m
+```
+*   **Mesh Configuration**:
+    *   **Grid Count**: Exactly $198,000\text{ cells}$ ($1000 \times 198 \times 1$).
+    *   **Refinement**: Highly dense grid mapping along the sediment-water interface ($y = 0.0\text{ m}$) and in the downstream expansion zone ($x \in [1.15, 3.0]\text{ m}$) to capture downstream scour profiles.
+    *   **Generation Tool**: Structured multi-block mesh generated via `blockMesh`.
+
+---
+
+## 🧪 Physics & Solver Setup
+The case is solved using the Eulerian-Eulerian two-phase equations, treating water as Phase B (fluid) and sediment as Phase A (solid dispersed grains).
+
+*   **Governing Model**: Frictional kinetic theory combined with dense-fluid rheology.
+*   **Turbulence Model**: `twophasekOmega` (Wilcox 2006 $k-\omega$ modified for two-phase density-stratified mixtures).
+*   **Friction Rheology**: $\mu(I)$ rheology model (`FrictionModel MuI`).
+*   **Particle Pressure Model**: `JohnsonJackson` (`ppModel JohnsonJackson`) configured with:
+    *   `Fr = 5e-2` (repulsion scale coefficient).
+    *   `eta1 = 5` (exponential packing stiffness).
+    *   `alphaMax = 0.625` (packing limit cap).
+*   **Threshold Coupling**: Frictional singularity threshold `alphaMaxG` in `granularRheologyProperties` is set to `0.650`, providing a safe $0.025$ numerical cushion above the particle pressure packing cap (`0.625`) to prevent division-by-zero singularities.
+
+---
+
+## 🎛️ Boundary & Initial Conditions
+
+### Boundary Patches
+1.  **`inlet`**: Left boundary ($x = 0$).
+2.  **`outlet`**: Right boundary ($x = 3.5\text{ m}$).
+3.  **`bottom`**: Solid flume floor ($y = -0.10\text{ m}$).
+4.  **`top`**: Upper water boundary ($y = 0.10\text{ m}$, excluding bridge blocked block).
+5.  **`bridge`**: Bridge deck boundaries (entry, soffit ceiling, exit).
+
+### Fields Summary
+| Field | inlet | outlet | bottom / bridge |
+|---|---|---|---|
+| **`alpha.a`** | `codedFixedValue` (tanh bed profile) | `zeroGradient` | `zeroGradient` |
+| **`alpha.b`** | `codedFixedValue` ($1.0 - \alpha_a$) | `zeroGradient` | `zeroGradient` |
+| **`U.b`** | `codedFixedValue` ($1/7^\text{th}$ log-law ramped over $5\text{ s}$; max $0.263\text{ m/s}$) | `inletOutlet` | `noSlip` |
+| **`U.a`** | `fixedValue uniform (0 0 0)` | `zeroGradient` | `noSlip` |
+| **`p_rbgh`** | `zeroGradient` | `fixedValue 0` | `fixedFluxPressure` |
+| **`k.b`** | `codedFixedValue` ($2.0\times 10^{-4}$ water, $10^{-8}$ bed) | `zeroGradient` | `kqRWallFunction` |
+| **`omega.b`** | `codedFixedValue` ($3.66$ water, $10^{-8}$ bed) | `zeroGradient` | `omegaWallFunction` |
+| **`Theta`** | `codedFixedValue` ($10^{-8}$ water, $10^{-4}$ bed) | `zeroGradient` | `zeroGradient` |
+
+---
+
+## 📂 Directory Structure
+```
+bridge_sedfoam_downstream/
+├── 0_org/                   # Boundary and initial condition templates
+│   ├── alpha.a              # Sediment volume fraction
+│   ├── alpha.b              # Water volume fraction
+│   ├── U.a                  # Sediment velocity
+│   ├── U.b                  # Water velocity
+│   └── [k.b, omega.b, pa...]
+├── constant/
+│   ├── g                    # Gravitational acceleration
+│   ├── ppProperties         # Johnson-Jackson particle pressure properties
+│   ├── granularRheologyProperties # Frictional rheology properties
+│   └── transportProperties  # Phase densities (rhoa=2650, rhob=1000) and diameters
+├── system/
+│   ├── blockMeshDict        # Mesh layout definitions
+│   ├── controlDict          # Adjustable timestep controls and write intervals
+│   ├── decomposeParDict     # Domain decomposition settings (8 cores)
+│   └── fvSchemes / fvSolution # Discretization schemes and linear solvers
+├── Allclean                 # Utility script to clean existing simulation files
+└── Allrun                   # Automated meshing, setup, and parallel run script
 ```
 
 ---
 
-## 4. Solver Fixes & Rigid-to-Mobile Bed Adaptation Log
+## 🚀 Execution Guide
 
-Converting the flume geometry from a rigid bed to a dynamic, erodible two-phase boundary layer required significant solver configuration changes. During testing, a numerical blow-up occurred due to `SIGFPE` (Floating Point Exception) and timestep collapses. 
-
-The following key modifications were made to ensure numerical stability and correct physics:
-
-### 4.1 Granular Frictional Pressure Model & Viscosity Limiter
-*   **What was changed**: Corrected `PPressureModel` to **`MuI`** and set `relaxPa` to **`1e-3`** (granular pressure damping) in [constant/granularRheologyProperties](file:///e:/DKS/bridge_sedfoam/constant/granularRheologyProperties). Set `nuMax` to **`5.0`** (effective granular viscosity limiter) in [constant/transportProperties](file:///e:/DKS/bridge_sedfoam/constant/transportProperties).
-*   **Why**: When granular pressure is unrelaxed or viscosity is unlimited (`nuMax` defaults to 10), the Boyer et al. effective viscosity blows up asymptotically ($\mu_{eff} \propto (1 - \alpha/\alpha_{max})^{-2}$) near the maximum packing limit. This causes numerical stiffness and solver divergence. Limiting $\mu_{eff}$ via `nuMax = 5.0` and damping the pressure updates with `relaxPa = 1e-3` stabilized the shear stress calculation near the sediment-water interface.
-
-### 4.2 Decoupled Packing Limits & Packing Limiter
-*   **What was changed**: Enabled **`packingLimiter yes`** with `alphaMax = 0.635` in [`constant/ppProperties`](file:///e:/DKS/bridge_sedfoam/constant/ppProperties), and set the granular rheology limit `alphaMaxG = 0.70` in [`constant/granularRheologyProperties`](file:///e:/DKS/bridge_sedfoam/constant/granularRheologyProperties).
-*   **Why**: Enabling the `packingLimiter` activates volume fraction redistribution to physically cap $\alpha_a \le 0.635$. Keeping a mathematical safety buffer between the contact pressure limit ($0.635$) and the viscosity rheology limit ($0.70$) ensures the denominator ($0.70 - \alpha_a$) remains strictly positive, permanently preventing negative viscosity calculation crashes and contact pressure division-by-zero singularities.
-
-### 4.3 Boundary Condition Corrections for Phase Fractions & Pressure
-*   **What was changed**: Changed the inlet boundary condition for `alpha.a` and `alpha.b` from `codedFixedValue` to **`zeroGradient`** in [0_org/alpha.a](file:///e:/DKS/bridge_sedfoam/0_org/alpha.a) and [0_org/alpha.b](file:///e:/DKS/bridge_sedfoam/0_org/alpha.b). Changed `p_rbgh` at the `bottom` and `bridge` patches from `zeroGradient` to **`fixedFluxPressure`** in [0_org/p_rbgh](file:///e:/DKS/bridge_sedfoam/0_org/p_rbgh).
-*   **Why**: The coded inlet was forcing a fixed concentration of $0.60$ at the inlet face every timestep, continuously pushing new particles into the domain and overloading the packing model at the upstream boundary. Zero gradient allows the bed to settle naturally based on the `setFields` initialization. Additionally, using `zeroGradient` for pressure on solid walls causes hydrostatic pressure decoupling in buoyant solvers; `fixedFluxPressure` ensures correct pressure-velocity coupling.
-
-### 4.4 Discretization Scheme Stabilization
-*   **What was changed**: Replaced the unbounded `Gauss linear` scheme for the Reynolds stress divergence terms `div(phiRa,Ua)` and `div(phiRb,Ub)` with **`Gauss linearUpwind grad(U.a)`** and **`grad(U.b)`** in [system/fvSchemes](file:///e:/DKS/bridge_sedfoam/system/fvSchemes).
-*   **Why**: The unbounded linear scheme caused high-speed velocity oscillations and unphysical jet shear under the sharp edge of the contraction deck, driving local divergence. The bounded `linearUpwind` scheme preserves second-order accuracy while ensuring numerical stability.
-
-### 4.5 Momentum/pa Relaxation & Multi-Correctors
-*   **What was changed**: Added momentum under-relaxation factors of **`0.5`** to the phase velocities (`"U.a"`, `"U.b"`) and **`0.2`** to `"pa"` under `relaxationFactors` in [system/fvSolution](file:///e:/DKS/bridge_sedfoam/system/fvSolution), while leaving `"alpha.a"` unrelaxed (`1.0`). Configured **`nOuterCorrectors 4`** and set Courant caps to **`maxCo 0.3`** in [system/controlDict](file:///e:/DKS/bridge_sedfoam/system/controlDict).
-*   **Why**: The momentum relaxation acts as a numerical damper to suppress high-frequency velocity oscillations driven by stiff drag coupling at the erodible interface, while leaving `"alpha.a"` unrelaxed prevents concentration lag. Tighter convergence is achieved via 4 outer PIMPLE iterations and a conservative Froude-based Courant limit.
-
----
-
-## 5. Prerequisites & Environment Setup
-
-The case is configured for OpenFOAM v2412 and the community build of SedFoam:
-*   **CFD Platform**: [OpenFOAM v2412](https://www.openfoam.com/)
-*   **Two-Phase Solver**: community build of `sedFoam_rbgh` (with compiled community library `libroughWallFunctions.so`)
-*   **Post-processing**: [ParaView](https://www.paraview.org/) or any visualization engine reading VTK/OpenFOAM formats
-
-Ensure your shell has sourced the OpenFOAM environment before launching:
+### Automated Run
+Execute the all-in-one setup and parallel run command:
 ```bash
-source /usr/lib/openfoam/openfoam2412/etc/bashrc
-```
-
----
-
-## 6. Step-by-Step Execution Guide
-
-To clean, build, and run the simulation in parallel, run the following commands in your Linux environment:
-
-### 6.1 Automatic Workflow Execution
-The wrapper scripts clean, mesh, initialize, partition, and launch the solver. Run from the case root:
-```bash
-# Clean directory and launch parallel run in the background
 ./Allrun
 ```
 
-### 6.2 Manual Execution Step-by-Step
-If you prefer to execute the toolchain manually:
+### Manual Step-by-Step Run
 
-```bash
-# 1. Clean previous run data
-./Allclean
+1.  **Clean Case Directories**:
+    ```bash
+    ./Allclean
+    ```
 
-# 2. Generate the structured hexahedral mesh
-blockMesh > log.blockMesh 2>&1
+2.  **Generate Structured Mesh**:
+    ```bash
+    blockMesh > log.blockMesh 2>&1
+    ```
 
-# 3. Copy original boundary fields
-cp -r 0_org 0
+3.  **Initialize Boundary Fields**:
+    ```bash
+    cp -r 0_org 0
+    setFields > log.setFields 2>&1
+    ```
 
-# 4. Initialize sediment bed height (y < 0) and velocities
-setFields > log.setFields 2>&1
+4.  **Extract Cell Centers**:
+    ```bash
+    postProcess -func writeCellCentres -time 0 > log.writeCellCentres 2>&1
+    ln -sf Cx 0/ccx
+    ln -sf Cy 0/ccy
+    ln -sf Cz 0/ccz
+    ```
 
-# 5. Pre-write cell centers for boundary layers
-postProcess -func writeCellCentres -time 0 > log.writeCellCentres 2>&1
-ln -s Cx 0/ccx 2>/dev/null || true
-ln -s Cy 0/ccy 2>/dev/null || true
-ln -s Cz 0/ccz 2>/dev/null || true
+5.  **Decompose Domain (8 Cores)**:
+    ```bash
+    decomposePar > log.decomposePar 2>&1
+    ```
 
-# 6. Decompose domain into 8 subdomains for parallel execution
-decomposePar > log.decomposePar 2>&1
-
-# 7. Run the parallel solver (change -np to match your processor cores)
-mpirun -np 8 sedFoam_rbgh -parallel > log.sedFoam_rbgh 2>&1 &
-```
-
-### 6.3 Directory Cleanup
-To reset the repository and delete mesh files, logs, and temporal solver outputs:
-```bash
-./Allclean
-```
-
----
-
-## 7. Post-Processing & Validation Metrics
-
-After the simulation finishes (or while it is running), you can evaluate the results using standard tools:
-
-### 7.1 Real-Time Convergence Check
-Monitor the solver outputs to ensure that continuity errors and Courant numbers remain bounded:
-```bash
-# View the end of the log file
-tail -f log.sedFoam_rbgh
-
-# Search for potential solver warnings
-grep -i "error\|fatal\|diverge" log.sedFoam_rbgh
-```
-
-### 7.2 Bed Shear Stress ($\tau_b$) Extraction
-The case is configured with `writeTau true` in [constant/forceProperties](file:///e:/DKS/bridge_sedfoam/constant/forceProperties). During execution, the solver outputs the bed shear stress profiles for the fluid and solid phases:
-1. Load the case in ParaView using the dummy file `fo.foam`.
-2. Apply the **Plot Over Line** filter along the sediment-water interface ($y = 0\text{ m}$, $x = 0$ to $8\text{ m}$).
-3. Plot the magnitude of the fluid shear stress (`tau.b`) and solid shear stress (`tau.a`) to analyze the spatial shear stress peaks.
-
-### 7.3 Scour Hole Profile Evolution
-To track the erodible bed surface deformation over time:
-1. In ParaView, select the sediment phase volume fraction field **`alpha.a`**.
-2. Apply a **Contour** filter at value `alpha.a = 0.30` (representing the mid-bed concentration boundary).
-3. The resulting contour line maps the morphodynamic profile of the scour hole. Export this contour as a `.csv` at different timesteps ($t = 1\text{ s}$, $5\text{ s}$, $10\text{ s}$, $60\text{ s}$) to plot the scour evolution.
+6.  **Run Solver in Parallel**:
+    ```bash
+    mpirun --oversubscribe -np 8 sedFoam_rbgh -parallel > log.sedFoam_rbgh 2>&1 &
+    ```
 
 ---
 
-## 8. Validation Comparison Graph
-
-> [!NOTE]
-> A new simulation run is currently in progress for **Grade-III Ahmedabad sand ($d_{50} = 0.294\text{ mm}$)**. The validation comparison graph and corresponding scour profile datasets (formerly generated for the $0.68\text{ mm}$ sand case) have been removed to prevent data mixing and will be updated here once the simulation reaches key timesteps.
+## 📊 Post-Processing
+*   **Reconstruction**: Reconstruct parallel time fields to single-directory format:
+    ```bash
+    reconstructPar -time [TIME_DIR]
+    ```
+*   **Bed Profile Extraction**: Identify the bed elevation contour line (where $\alpha_a = 0.30$) using the parsed `0/ccx`, `0/ccy`, and `[TIME_DIR]/alpha.a` coordinates.
+*   **Visualization**: Load the case in ParaView by creating an empty `.foam` file:
+    ```bash
+    touch fo.foam && paraview fo.foam
+    ```
 
 ---
 
-## Acknowledgements & References
-
-If you use or adapt this validation case, please formally cite the baseline experimental study:
-
-```bibtex
-@article{majid2026roughness,
-  author = {Majid, Sofi Aamir and Tripathi, Shivam and Das, Debopam},
-  title = {Effect of Bed Roughness on Pressure Flow due to Vertical Contraction},
-  journal = {Journal of Hydraulic Engineering},
-  volume = {152},
-  number = {3},
-  pages = {04025001},
-  year = {2026},
-  doi = {10.1061/JHEND8.HYENG-14490}
-}
-```
-
-*Special thanks to the OpenFOAM Foundation and the SedFoam developer community for providing the underlying two-phase solver libraries.*
+## 👥 Author & Research Context
+*   **Researcher**: [Divyansh Kumar Singh](https://github.com/DKS-MANAGER) (MTech Civil Engineering - Hydraulic Engineering, IIT Kanpur)
+*   **Laboratory**: Hydraulic and Water Resources Engineering (HWRE) Lab, IIT Kanpur
+*   **Contact**: [divyansh179@gmail.com](mailto:divyansh179@gmail.com) | [LinkedIn](https://www.linkedin.com/in/divyansh-kumar-singh-92bb621b6)
