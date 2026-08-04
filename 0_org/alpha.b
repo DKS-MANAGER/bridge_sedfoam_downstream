@@ -46,7 +46,7 @@ boundaryField
             scalarField& field = *this; 
             forAll(Cf, faceI)
             {
-                 field[faceI] = 1.0 - (0.60 * 0.5
+                  field[faceI] = 1.0 - (0.60 * 0.5
                                *(1.0 + Foam::tanh((0.0 - Cf[faceI].y()) * 5000))
                                + 1e-100);
             }

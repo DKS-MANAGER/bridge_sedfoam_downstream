@@ -57,8 +57,10 @@ The case is solved using the Eulerian-Eulerian two-phase equations, treating wat
 *   **Particle Pressure Model**: `JohnsonJackson` (`ppModel JohnsonJackson`) configured with:
     *   `Fr = 5e-2` (repulsion scale coefficient).
     *   `eta1 = 5` (exponential packing stiffness).
-    *   `alphaMax = 0.625` (packing limit cap).
-*   **Threshold Coupling**: Frictional singularity threshold `alphaMaxG` in `granularRheologyProperties` is set to `0.650`, providing a safe $0.025$ numerical cushion above the particle pressure packing cap (`0.625`) to prevent division-by-zero singularities.
+    *   `alphaMax = 0.635` (packing limit cap).
+    *   `packingLimiter = yes` (numerical flux limiter to prevent touching the singularity).
+*   **Threshold Coupling**: Frictional singularity threshold `alphaMaxG` in `granularRheologyProperties` is set to `0.625`, providing a strict threshold hierarchy `alphaMinFriction (0.57) < alphaMaxG (0.625) < alphaMax (0.635)` to prevent negative denominators in the $\mu(I)$ rheology model.
+*   **Time Integration**: Courant number limits set to `maxCo 0.5` and `maxAlphaCo 0.5` with `relaxPa 5e-6` for numerical stability.
 
 ---
 

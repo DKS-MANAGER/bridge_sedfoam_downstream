@@ -47,10 +47,10 @@ runTimeModifiable on;
 
 adjustTimeStep  true;
 
-maxCo           0.5;    // Standard stable PIMPLE Courant limit
+maxCo           0.5;
 
-maxAlphaCo      0.7;    // Allows larger timesteps for speed
+maxAlphaCo      0.5;
 
-maxDeltaT       0.01;   // 10.0 ms timestep ceiling (10x faster execution speed)
+maxDeltaT       0.01;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
