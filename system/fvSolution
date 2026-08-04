@@ -113,10 +113,10 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors    2;       // 2 outer PIMPLE iterations for stability
+    nOuterCorrectors    3;       // 3 outer PIMPLE iterations for stability
     nNonOrthogonalCorrectors 1; // mesh is orthogonal but 1 adds robustness
     nCorrectors         2;
-    nAlphaCorr      1;
+    nAlphaCorr      2;
     correctAlpha    yes;         // enabled to stabilize concentration coupling at higher timesteps
 }
 
