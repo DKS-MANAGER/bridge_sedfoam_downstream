@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         400;
+endTime         100;
 
 deltaT          1e-5;   // very conservative startup - allows bed to settle before shockwaves
 
@@ -47,10 +47,10 @@ runTimeModifiable on;
 
 adjustTimeStep  true;
 
-maxCo           0.5;
+maxCo           0.4;    // Restored fluid Courant limit for startup stability
 
-maxAlphaCo      0.5;
+maxAlphaCo      0.4;    // Restored phase Courant limit for startup stability
 
-maxDeltaT       0.01;
+maxDeltaT       1e-3;   // Retain 1ms ceiling - will scale up once startup transient passes
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

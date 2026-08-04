@@ -22,35 +22,7 @@ boundaryField
 {
     inlet
     {
-        type            codedFixedValue;
-        value           uniform 1;
-        name            inletProfileAlphaB;
-        codeInclude
-        #{
-            #include "fvCFD.H"
-        #};
-        codeOptions
-        #{
-            -I$(LIB_SRC)/finiteVolume/lnInclude \
-            -I$(LIB_SRC)/meshTools/lnInclude
-        #};
-        codeLibs
-        #{
-            -lfiniteVolume \
-            -lmeshTools
-        #};
-        code
-        #{
-            const fvPatch& boundaryPatch = patch();
-            const vectorField& Cf = boundaryPatch.Cf();
-            scalarField& field = *this; 
-            forAll(Cf, faceI)
-            {
-                  field[faceI] = 1.0 - (0.60 * 0.5
-                               *(1.0 + Foam::tanh((0.0 - Cf[faceI].y()) * 5000))
-                               + 1e-100);
-            }
-        #};
+        type            zeroGradient;
     }
     outlet
     {

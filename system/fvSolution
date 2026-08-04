@@ -113,19 +113,27 @@ solvers
 
 PIMPLE
 {
+    nOuterCorrectors    2;       // 2 outer PIMPLE iterations for stability
+    nNonOrthogonalCorrectors 1; // mesh is orthogonal but 1 adds robustness
     nCorrectors         2;
-    nNonOrthogonalCorrectors 1;
     nAlphaCorr      1;
-    correctAlpha    yes;
-    pRefPoint       (3.49 0.099 0.0);
-    pRefValue       0;
+    correctAlpha    yes;         // enabled to stabilize concentration coupling at higher timesteps
 }
 
 relaxationFactors
 {
     fields
     {
-        pa              1.;
+        p_rbgh              0.3;   // aggressive pressure damping
+    }
+    equations
+    {
+        "U.a"               0.5;   // sediment velocity - damped for stability
+        "U.b"               0.7;   // fluid velocity
+        "alpha.a"           0.5;   // phase fraction - damped to prevent overpacking
+        "pa"                0.3;   // granular pressure - damped to prevent pressure spikes
+        "k.b"               0.7;
+        "omega.b"           0.7;
     }
 }
 

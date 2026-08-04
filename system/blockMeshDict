@@ -71,22 +71,24 @@ vertices
 
 blocks
 (
-    // Bottom Layer: Sediment Bed (y: -0.10 to 0.0 m, 90 cells in Y)
-    hex (0 1 6 5 20 21 26 25)     (160 90 1)  simpleGrading (0.5 0.15 1)
-    hex (1 2 7 6 21 22 27 26)     (100 90 1)  simpleGrading (1.0 0.15 1)
-    hex (2 3 8 7 22 23 28 27)     (670 90 1)  simpleGrading (2.5 0.15 1)
-    hex (3 4 9 8 23 24 29 28)     (70  90 1)  simpleGrading (1.5 0.15 1)
+    // Bottom Layer: Sediment Bed (y: -0.10 to 0.0 m, 80 cells in Y)
+    // X: 120 upstream | 80 bridge zone | 340 downstream | 50 buffer = 590 total
+    hex (0 1 6 5 20 21 26 25)     (120 80 1)  simpleGrading (0.5 0.15 1)
+    hex (1 2 7 6 21 22 27 26)     (80  80 1)  simpleGrading (1.0 0.15 1)
+    hex (2 3 8 7 22 23 28 27)     (340 80 1)  simpleGrading (2.5 0.15 1)
+    hex (3 4 9 8 23 24 29 28)     (50  80 1)  simpleGrading (1.5 0.15 1)
 
-    // Middle Layer: Lower Fluid/Water (y: 0.0 to 0.075 m, 90 cells in Y)
-    hex (5 6 11 10 25 26 31 30)   (160 90 1)  simpleGrading (0.5 6.0 1)
-    hex (6 7 12 11 26 27 32 31)   (100 90 1)  simpleGrading (1.0 6.0 1)
-    hex (7 8 13 12 27 28 33 32)   (670 90 1)  simpleGrading (2.5 6.0 1)
-    hex (8 9 14 13 28 29 34 33)   (70  90 1)  simpleGrading (1.5 6.0 1)
+    // Middle Layer: Lower Fluid/Water (y: 0.0 to 0.075 m, 72 cells in Y)
+    hex (5 6 11 10 25 26 31 30)   (120 72 1)  simpleGrading (0.5 6.0 1)
+    hex (6 7 12 11 26 27 32 31)   (80  72 1)  simpleGrading (1.0 6.0 1)
+    hex (7 8 13 12 27 28 33 32)   (340 72 1)  simpleGrading (2.5 6.0 1)
+    hex (8 9 14 13 28 29 34 33)   (50  72 1)  simpleGrading (1.5 6.0 1)
 
     // Top Layer: Upper Fluid/Water (y: 0.075 to 0.10 m, 20 cells in Y, excluding bridge block)
-    hex (10 11 16 15 30 31 36 35) (160 20 1)  simpleGrading (0.5 2.0 1)
-    hex (12 13 18 17 32 33 38 37) (670 20 1)  simpleGrading (2.5 2.0 1)
-    hex (13 14 19 18 33 34 39 38) (70  20 1)  simpleGrading (1.5 2.0 1)
+    // X: 120 upstream | 340 downstream | 50 buffer = 510 total (no bridge block)
+    hex (10 11 16 15 30 31 36 35) (120 20 1)  simpleGrading (0.5 2.0 1)
+    hex (12 13 18 17 32 33 38 37) (340 20 1)  simpleGrading (2.5 2.0 1)
+    hex (13 14 19 18 33 34 39 38) (50  20 1)  simpleGrading (1.5 2.0 1)
 );
 
 edges
