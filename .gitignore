@@ -10,3 +10,11 @@ dynamicCode/
 Thumbs.db
 *.bak
 *~
+
+# Unnecessary run-time and temporary scripts
+gradPOSC.txt
+check_cs.py
+extract_paper_params.py
+run_all_cases.sh
+log.test
+
