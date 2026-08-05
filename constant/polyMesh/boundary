@@ -21,41 +21,41 @@ FoamFile
     inlet
     {
         type            patch;
-        nFaces          172;
-        startFace       198978;
+        nFaces          135;
+        startFace       156160;
     }
     outlet
     {
         type            patch;
-        nFaces          172;
-        startFace       199150;
+        nFaces          135;
+        startFace       156295;
     }
     bottom
     {
         type            wall;
         inGroups        1(wall);
         nFaces          590;
-        startFace       199322;
+        startFace       156430;
     }
     top
     {
         type            patch;
         nFaces          510;
-        startFace       199912;
+        startFace       157020;
     }
     bridge
     {
         type            wall;
         inGroups        1(wall);
-        nFaces          120;
-        startFace       200422;
+        nFaces          110;
+        startFace       157530;
     }
     frontAndBack
     {
         type            empty;
         inGroups        1(empty);
-        nFaces          199760;
-        startFace       200542;
+        nFaces          156900;
+        startFace       157640;
     }
 )
 

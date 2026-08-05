@@ -31,11 +31,11 @@ vertices
     (3.0   0.0  -0.005)   // 8: interface scour zone end
     (3.5   0.0  -0.005)   // 9: interface outlet
     
-    (0.0   0.070 -0.005)  // 10: soffit level inlet
-    (1.0   0.070 -0.005)  // 11: soffit level bridge inlet
-    (1.15  0.070 -0.005)  // 12: soffit level bridge exit
-    (3.0   0.070 -0.005)  // 13: soffit level scour zone end
-    (3.5   0.070 -0.005)  // 14: soffit level outlet
+    (0.0   0.075 -0.005)  // 10: soffit level inlet
+    (1.0   0.075 -0.005)  // 11: soffit level bridge inlet
+    (1.15  0.075 -0.005)  // 12: soffit level bridge exit
+    (3.0   0.075 -0.005)  // 13: soffit level scour zone end
+    (3.5   0.075 -0.005)  // 14: soffit level outlet
     
     (0.0   0.10  -0.005)  // 15: top inlet
     (1.0   0.10  -0.005)  // 16: top bridge inlet
@@ -56,11 +56,11 @@ vertices
     (3.0   0.0   0.005)   // 28: interface scour zone end
     (3.5   0.0   0.005)   // 29: interface outlet
     
-    (0.0   0.070  0.005)  // 30: soffit level inlet
-    (1.0   0.070  0.005)  // 31: soffit level bridge inlet
-    (1.15  0.070  0.005)  // 32: soffit level bridge exit
-    (3.0   0.070  0.005)  // 33: soffit level scour zone end
-    (3.5   0.070  0.005)  // 34: soffit level outlet
+    (0.0   0.075  0.005)  // 30: soffit level inlet
+    (1.0   0.075  0.005)  // 31: soffit level bridge inlet
+    (1.15  0.075  0.005)  // 32: soffit level bridge exit
+    (3.0   0.075  0.005)  // 33: soffit level scour zone end
+    (3.5   0.075  0.005)  // 34: soffit level outlet
     
     (0.0   0.10   0.005)  // 35: top inlet
     (1.0   0.10   0.005)  // 36: top bridge inlet
@@ -71,24 +71,24 @@ vertices
 
 blocks
 (
-    // Bottom Layer: Sediment Bed (y: -0.10 to 0.0 m, 80 cells in Y)
+    // Bottom Layer: Sediment Bed (y: -0.10 to 0.0 m, 60 cells in Y)
     // X: 120 upstream | 80 bridge zone | 340 downstream | 50 buffer = 590 total
-    hex (0 1 6 5 20 21 26 25)     (120 80 1)  simpleGrading (0.5 0.15 1)
-    hex (1 2 7 6 21 22 27 26)     (80  80 1)  simpleGrading (1.0 0.15 1)
-    hex (2 3 8 7 22 23 28 27)     (340 80 1)  simpleGrading (2.5 0.15 1)
-    hex (3 4 9 8 23 24 29 28)     (50  80 1)  simpleGrading (1.5 0.15 1)
+    hex (0 1 6 5 20 21 26 25)     (120 60 1)  simpleGrading (0.5 0.5 1)
+    hex (1 2 7 6 21 22 27 26)     (80  60 1)  simpleGrading (1.0 0.5 1)
+    hex (2 3 8 7 22 23 28 27)     (340 60 1)  simpleGrading (2.5 0.5 1)
+    hex (3 4 9 8 23 24 29 28)     (50  60 1)  simpleGrading (1.5 0.5 1)
 
-    // Middle Layer: Lower Fluid/Water (y: 0.0 to 0.075 m, 72 cells in Y)
-    hex (5 6 11 10 25 26 31 30)   (120 72 1)  simpleGrading (0.5 6.0 1)
-    hex (6 7 12 11 26 27 32 31)   (80  72 1)  simpleGrading (1.0 6.0 1)
-    hex (7 8 13 12 27 28 33 32)   (340 72 1)  simpleGrading (2.5 6.0 1)
-    hex (8 9 14 13 28 29 34 33)   (50  72 1)  simpleGrading (1.5 6.0 1)
+    // Middle Layer: Lower Fluid/Water (y: 0.0 to 0.075 m, 60 cells in Y)
+    hex (5 6 11 10 25 26 31 30)   (120 60 1)  simpleGrading (0.5 2.0 1)
+    hex (6 7 12 11 26 27 32 31)   (80  60 1)  simpleGrading (1.0 2.0 1)
+    hex (7 8 13 12 27 28 33 32)   (340 60 1)  simpleGrading (2.5 2.0 1)
+    hex (8 9 14 13 28 29 34 33)   (50  60 1)  simpleGrading (1.5 2.0 1)
 
-    // Top Layer: Upper Fluid/Water (y: 0.075 to 0.10 m, 20 cells in Y, excluding bridge block)
+    // Top Layer: Upper Fluid/Water (y: 0.075 to 0.10 m, 15 cells in Y, excluding bridge block)
     // X: 120 upstream | 340 downstream | 50 buffer = 510 total (no bridge block)
-    hex (10 11 16 15 30 31 36 35) (120 20 1)  simpleGrading (0.5 2.0 1)
-    hex (12 13 18 17 32 33 38 37) (340 20 1)  simpleGrading (2.5 2.0 1)
-    hex (13 14 19 18 33 34 39 38) (50  20 1)  simpleGrading (1.5 2.0 1)
+    hex (10 11 16 15 30 31 36 35) (120 15 1)  simpleGrading (0.5 1.0 1)
+    hex (12 13 18 17 32 33 38 37) (340 15 1)  simpleGrading (2.5 1.0 1)
+    hex (13 14 19 18 33 34 39 38) (50  15 1)  simpleGrading (1.5 1.0 1)
 );
 
 edges
