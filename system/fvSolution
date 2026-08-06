@@ -113,7 +113,7 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors    3;       // 3 outer PIMPLE iterations for stability
+    nOuterCorrectors    4;       // 4 outer PIMPLE iterations for stability
     nNonOrthogonalCorrectors 1; // mesh is orthogonal but 1 adds robustness
     nCorrectors         2;
     nAlphaCorr      2;
@@ -128,10 +128,10 @@ relaxationFactors
     }
     equations
     {
-        "U.a"               0.5;   // sediment velocity - damped for stability
+        "U.a"               0.4;   // sediment velocity - damped for stability
         "U.b"               0.7;   // fluid velocity
-        "alpha.a"           0.5;   // phase fraction - damped to prevent overpacking
-        "pa"                0.3;   // granular pressure - damped to prevent pressure spikes
+        "alpha.a"           0.4;   // phase fraction - damped to prevent overpacking
+        "pa"                0.2;   // granular pressure - damped to prevent pressure spikes
         "k.b"               0.7;
         "omega.b"           0.7;
     }

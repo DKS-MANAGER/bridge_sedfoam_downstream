@@ -31,15 +31,15 @@ boundaryField
             const vectorField& Cf = boundaryPatch.Cf();
             vectorField& field = *this;
             scalar t = this->db().time().value();
-            scalar ramp = t <= 5.0 ? (0.1 + 0.9 * (t / 5.0)) : 1.0;
+            scalar ramp = t <= 10.0 ? (0.05 + 0.95 * (t / 10.0)) : 1.0;
 
             forAll(Cf, faceI)
             {
                 scalar y = Cf[faceI].y();
                 if (y > 0.0)
                 {
-                    scalar ratio = Foam::max(0.0, y) / 0.10;
-                    scalar u_x = ramp * 0.25 * Foam::pow(ratio, 1.0/7.0);
+                    scalar ratio = Foam::max(0.0, y) / 0.1107;
+                    scalar u_x = ramp * 0.23 * Foam::pow(ratio, 1.0/7.0);
                     field[faceI] = vector(u_x, 0, 0);
                 }
                 else

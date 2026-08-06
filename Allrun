@@ -1,7 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 cd "${0%/*}" || exit                                # Run from this directory
 
 # Source OpenFOAM utilities
+if [ -z "$WM_PROJECT_DIR" ]; then
+    . /usr/lib/openfoam/openfoam2412/etc/bashrc
+fi
 . ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions
 
 # Clean case
@@ -29,7 +32,7 @@ echo "Decomposing case..."
 decomposePar > log.decomposePar 2>&1
 
 echo "Starting automated writeInterval monitor..."
-python3 -c "
+nohup python3 -c "
 import time, os, re
 while True:
     time.sleep(5)
@@ -56,10 +59,10 @@ while True:
                     f.write(new_c)
         except Exception:
             pass
-" &
+" > log.monitor 2>&1 & disown
 
 echo "Running sedFoam_rbgh on 8 processors..."
-mpirun --oversubscribe -np 8 sedFoam_rbgh -parallel > log.sedFoam_rbgh 2>&1 &
+nohup mpirun --oversubscribe -np 8 sedFoam_rbgh -parallel > log.sedFoam_rbgh 2>&1 & disown
 
 echo "Simulation launched in background with automatic output saving schedule."
 

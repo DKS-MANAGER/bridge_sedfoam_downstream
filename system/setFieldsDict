@@ -33,8 +33,8 @@ regions
         box (0.0 -0.10 -0.01) (3.5 0.0 0.01);
         fieldValues
         (
-            volScalarFieldValue alpha.a 0.60
-            volScalarFieldValue alpha.b 0.40
+            volScalarFieldValue alpha.a 0.58
+            volScalarFieldValue alpha.b 0.42
             volScalarFieldValue Theta 1e-4
             volVectorFieldValue U.b (0 0 0)
             volScalarFieldValue k.b 1e-8
