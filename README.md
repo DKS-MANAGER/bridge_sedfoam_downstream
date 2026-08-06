@@ -33,17 +33,17 @@
 
 ---
 
-## 📊 Experimental Validation & Scour Evolution ($t = 100\text{ s}$)
+## 📊 Experimental Validation & Scour Evolution ($t = 130\text{ s}$)
 
 ### 1. Downstream Scour Profile Comparison ($x = 0.5$ to $2.0\text{ m}$)
 ![Downstream Scour Profile Comparison](scour_comparison_t100.png)
 
-### 2. Morphodynamic Bed Evolution Animation ($t = 10$ to $100\text{ s}$)
+### 2. Morphodynamic Bed Evolution Animation ($t = 10$ to $130\text{ s}$)
 ![Downstream Scour Evolution Animation](scour_evolution_0_100.gif)
 
 *   **Validated Benchmark:** Compared against experimental data from **Das (2016) / Majid et al. (2026)** (*ASCE J. Hydraulic Engineering*) for $H_b/Y = 0.60, V_a = 23\text{ cm/s}, d_{50} = 0.250\text{ mm}$.
 *   **Downstream Scour Hole:** At equilibrium, the maximum scour hole shifts downstream of the bridge deck exit ($x = 1.15\text{ m}$) to $x = 1.248\text{ m}$ (depth $-2.85\text{ cm}$).
-*   **SedFoam CFD Trajectory:** At $t = 100\text{ s}$, the CFD model actively expands the bed erosion past the deck exit, creating the downstream wake deposition mound ($x = 1.30 - 1.60\text{ m}$).
+*   **SedFoam CFD Trajectory:** At $t = 130\text{ s}$, the CFD model actively expands the bed erosion past the deck exit, creating the downstream wake deposition mound ($x = 1.30 - 1.60\text{ m}$).
 
 ---
 
